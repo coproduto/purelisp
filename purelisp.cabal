@@ -1,0 +1,69 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 56ba77a5eb8bea2dc308fde7b03fe4334fe4087cca060d3c7d6573acd2e9aa82
+
+name:           purelisp
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/purelisp#readme>
+homepage:       https://github.com/coproduto/purelisp#readme
+bug-reports:    https://github.com/coproduto/purelisp/issues
+author:         Pedro Castilho
+maintainer:     cstl.px@gmail.com
+copyright:      2021 Pedro Castilho
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/coproduto/purelisp
+
+library
+  exposed-modules:
+      Language.PureLisp.Parser
+      Lib
+  other-modules:
+      Paths_purelisp
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , parsec
+    , text
+  default-language: Haskell2010
+
+executable purelisp-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_purelisp
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , parsec
+    , purelisp
+    , text
+  default-language: Haskell2010
+
+test-suite purelisp-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_purelisp
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , parsec
+    , purelisp
+    , text
+  default-language: Haskell2010
