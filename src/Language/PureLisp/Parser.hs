@@ -1,9 +1,9 @@
 module Language.PureLisp.Parser where
 
-import Control.Monad
+import Control.Applicative ((*>))
+import Control.Monad (liftM)
 
 import Text.Parsec
-import Text.Parsec.Prim
 
 data InputMetadata = InputMetadata
   { metadataLine :: Int
@@ -13,6 +13,7 @@ data InputMetadata = InputMetadata
 data LispInput
   = Atom InputMetadata String
   | Pair LispInput LispInput
+  | ListMeta InputMetadata LispInput
   deriving Show
 
 type Parser = Parsec String ()
@@ -33,21 +34,21 @@ parseAtom = do
   return $ Atom meta (first:rest)
 
 parseHsList :: Parser [LispInput]
-parseHsList = parseLispInput `sepBy` spaces
+parseHsList = spaces *> parseLispInput `sepEndBy` spaces
 
 parseConsListItems :: Parser LispInput
 parseConsListItems = do
-  pos <- getPosition
   list <- parseHsList
   meta <- getInputMetadata
   return $ foldr Pair (Atom meta "nil") list
 
 parseConsList :: Parser LispInput
 parseConsList = do
+  meta <- getInputMetadata
   char '('
   list <- parseConsListItems
   char ')'
-  return list
+  return $ ListMeta meta list
 
 parseLispInput :: Parser LispInput
 parseLispInput = parseAtom <|> parseConsList
