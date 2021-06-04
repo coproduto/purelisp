@@ -1,9 +1,15 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Language.PureLisp.Parser where
 
 import Control.Applicative ((*>))
 import Control.Monad (liftM)
 
+import qualified Data.Text as Text
+import Data.Text (Text)
+
 import Text.Parsec
+
+type Parser = Parsec Text ()
 
 data InputMetadata = InputMetadata
   { metadataLine :: Int
@@ -11,12 +17,10 @@ data InputMetadata = InputMetadata
   } deriving Show
 
 data LispInput
-  = Atom InputMetadata String
+  = Atom InputMetadata Text
   | Pair LispInput LispInput
   | ListMeta InputMetadata LispInput
   deriving Show
-
-type Parser = Parsec String ()
 
 getInputMetadata :: Parser InputMetadata
 getInputMetadata = do
@@ -31,7 +35,7 @@ parseAtom = do
   meta <- getInputMetadata
   first <- letter
   rest <- many (letter <|> digit)
-  return $ Atom meta (first:rest)
+  return $ Atom meta (Text.pack (first:rest))
 
 parseHsList :: Parser [LispInput]
 parseHsList = spaces *> parseLispInput `sepEndBy` spaces
@@ -40,7 +44,7 @@ parseConsListItems :: Parser LispInput
 parseConsListItems = do
   list <- parseHsList
   meta <- getInputMetadata
-  return $ foldr Pair (Atom meta "nil") list
+  return $ foldr Pair (Atom meta "()") list
 
 parseConsList :: Parser LispInput
 parseConsList = do
